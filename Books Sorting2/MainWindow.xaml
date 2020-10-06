@@ -1,0 +1,56 @@
+﻿<Window x:Class="Books_Sorting2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Books_Sorting2"
+        mc:Ignorable="d"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        Height="600" Width="1080" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+    <Grid>
+        <Grid Height="60" VerticalAlignment="Top" Background="Purple">
+            <TextBlock Text="The Book Shelves" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" FontFamily="Cooper Black"/>
+            <Button x:Name="id_Btn" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Click="id_Btn_Click">
+                <materialDesign:PackIcon Kind="Power"/>
+            </Button>
+        </Grid>
+        <Grid Margin="0 60 0 0">
+            <dragablz:TabablzControl x:Name="theTabablzID" SelectionChanged="TabablzControl_SelectionChanged" FontSize="20" FontFamily="Cooper Black">
+                <dragablz:TabablzControl.InterTabController>
+                    <dragablz:InterTabController/>
+                </dragablz:TabablzControl.InterTabController>
+                <TabItem>
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="FindReplace" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
+                    </TabItem.Header>
+                    <ListView x:Name="listName_ID" FontSize="20" FontFamily="Cooper Black">
+
+                    </ListView>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="Identifier" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
+                    </TabItem.Header>
+                    <TextBlock Text="Identify Areas Comming Soon" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="Search" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
+                    </TabItem.Header>
+                    <TextBlock Text="Find Call Number Comming Soon" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </TabItem>
+            </dragablz:TabablzControl>
+            <ProgressBar x:Name="ProgressBarStatus" HorizontalAlignment="Left" Height="70" Margin="426,10,0,0" VerticalAlignment="Top" Width="381" ValueChanged="ProgressBar_ValueChanged" FontSize="20"/>
+            <TextBlock x:Name="ProgressTextBlock" HorizontalAlignment="Left" Margin="426,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="56" Width="208" FontSize="20" FontFamily="Cooper Black"/>
+            <Button x:Name="DoWorkButton" Content="Reorder" HorizontalAlignment="Left" Margin="811,57,0,0" VerticalAlignment="Top" Width="121" Click="DoWorkButton_Click" Height="100" FontSize="20" FontFamily="Cooper Black"/>
+        </Grid>
+    </Grid>
+</Window>
