@@ -23,16 +23,25 @@ using System.Threading;
 
 namespace Books_Sorting2
 {
+    /// <summary>
+    /// 17395647 Sbongiseni Mbaraga
+    /// </summary>
     public partial class MainWindow : Window
     {
+        //Stored all the call numbers into the list
         List<BookDetails2> call_number = new List<BookDetails2>();
         Random range = new Random();
         NextDouble nextDouble = new NextDouble();
+        Dictionary<int, string> CallNumbersAndClassificationDictionary = new Dictionary<int, string>();
+        int[] sortRandomly = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900};
+
         public MainWindow()
         {
             InitializeComponent();
             AddUnsortedCollection();
+            add();
         }
+        //adds all the call numbers and randomly generate their number within a range then displays it
         private void AddUnsortedCollection()
         {
             call_number.Add(new BookDetails2(nextDouble.NextDouble2(range, 005.73, 050.73).ToString("000.00"), "SIG"));
@@ -64,6 +73,7 @@ namespace Books_Sorting2
                 listName_ID.Items.Add(item.BookNumber + ": " + item.AuthorDetails);
             }
         }
+        //delays the methods 
         async Task UseDelay()
         {
             await Task.Delay(1000);
@@ -73,6 +83,7 @@ namespace Books_Sorting2
             await Task.Delay(1000);
             Compare();
         }
+        //verification message that tells the user that the call number has been added
         private void CorrectCallNumberMessage()
         {
             MessageBox.Show("The Call Numbers Have Been Sorted Correctly", "CORRECT");
@@ -127,11 +138,112 @@ namespace Books_Sorting2
         {
             this.Close();
         }
+        //When you select a index you will get a message box
         private void TabablzControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
         private void ProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+        }
+        //adds all the data needed to be displayed and displays it too the user
+        private void add()
+        {
+            CallNumberAndClassification();
+            SortsCallNumbersRandomly();
+        }
+        //works when the user clicks on the view
+        private void listViewID_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+        }
+        //Adds callnumbers and classification into dictionary then outputs the classification to listview
+        private void CallNumberAndClassification()
+        {
+
+            CallNumbersAndClassificationDictionary.Add(0, "General Knowlege");
+            CallNumbersAndClassificationDictionary.Add(100, "Philosophy");
+            CallNumbersAndClassificationDictionary.Add(200, "Religion");
+            CallNumbersAndClassificationDictionary.Add(300, "Social Science");
+            CallNumbersAndClassificationDictionary.Add(400, "Language");
+            CallNumbersAndClassificationDictionary.Add(500, "Science");
+            CallNumbersAndClassificationDictionary.Add(600, "Technology");
+            CallNumbersAndClassificationDictionary.Add(700, "Art and Recreation");
+            CallNumbersAndClassificationDictionary.Add(800, "Literature");
+            CallNumbersAndClassificationDictionary.Add(900, "History and Geography");
+
+            foreach (var item in CallNumbersAndClassificationDictionary)
+            {
+                listViewID.Items.Add(item.Value);
+            }
+
+        }
+        //Shuffles the data within the array then adds it too the call number combobox
+        private void SortsCallNumbersRandomly()
+        {
+            ShuffleArray shuffleArray = new ShuffleArray();
+
+            shuffleArray.ShuffleArray2(sortRandomly);
+            foreach (var item in sortRandomly)
+            {
+                CallNumberItems.Items.Add(item);
+                CallNumberItems2.Items.Add(item);
+                CallNumberItems3.Items.Add(item);
+                CallNumberItems4.Items.Add(item);
+            }
+        }
+        //The Check button, starts the progress bar then executes the check function
+        private async void BtnID_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> list = new List<string>();
+            for (int i = 0; i < 1000; i++)
+            {
+                list.Add(i.ToString());
+            }
+            var progress = new Progress<ProgressReport>();
+            progress.ProgressChanged += (o, report) =>
+             {
+                 ProgressBarStatus2.Value = report.PercentComplete;
+             };
+            await ProcessData(list, progress);
+            ChecksIfItemIsCorrect();
+        }
+        //Count in the background
+        private Task ProcessData(List<string> list, IProgress<ProgressReport> progress)
+        {
+            int index = 1;
+            int totalProcess = list.Count;
+            var progressReport = new ProgressReport();
+            return Task.Run(() =>
+            {
+                for (int i = 0; i < totalProcess; i++)
+                {
+                    progressReport.PercentComplete = index++ * 100 / totalProcess;
+                    progress.Report(progressReport);
+                    Thread.Sleep(2);
+                }
+            });
+        }
+        //Saves the Muiltiply selected description into an arraylist then compares it too the callnumber and classification dictionary and see which in is corret
+        private void ChecksIfItemIsCorrect()
+        {
+            ArrayList saveSelectedITems = new ArrayList();
+
+            foreach (var item in listViewID.SelectedItems)
+            {
+                saveSelectedITems.Add(item + "");
+            }
+            foreach (var item2 in saveSelectedITems)
+            {
+                foreach (var item3 in CallNumbersAndClassificationDictionary)
+                {
+                    if (item2.Equals(item3.Value))
+                    {
+                        if (CallNumberItems.SelectedItem.Equals(item3.Key) || CallNumberItems2.SelectedItem.Equals(item3.Key) || CallNumberItems3.SelectedItem.Equals(item3.Key) || CallNumberItems4.SelectedItem.Equals(item3.Key))
+                        {
+                            MessageBox.Show("Correct Answer CallNumber: " + item3.Key + " Description: " + item3.Value);
+                        }
+                    }
+                }
+            }
         }
     }
 }

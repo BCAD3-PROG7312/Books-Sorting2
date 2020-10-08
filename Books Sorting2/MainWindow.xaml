@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Books_Sorting2"
         mc:Ignorable="d"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-        Height="600" Width="1080" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None"
+        Height="620.8" Width="1080" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -27,30 +27,68 @@
                 <dragablz:TabablzControl.InterTabController>
                     <dragablz:InterTabController/>
                 </dragablz:TabablzControl.InterTabController>
+                
+                
                 <TabItem>
                     <TabItem.Header>
                         <materialDesign:PackIcon Kind="FindReplace" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
                     </TabItem.Header>
-                    <ListView x:Name="listName_ID" FontSize="20" FontFamily="Cooper Black">
+                    <Grid>
+                        <ListView x:Name="listName_ID" FontSize="20" FontFamily="Cooper Black">
 
-                    </ListView>
+                        </ListView>
+
+                        <ProgressBar x:Name="ProgressBarStatus" HorizontalAlignment="Left" Height="70" Margin="426,10,0,0" VerticalAlignment="Top" Width="381" ValueChanged="ProgressBar_ValueChanged" FontSize="20"/>
+                        <TextBlock x:Name="ProgressTextBlock" HorizontalAlignment="Left" Margin="426,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="56" Width="208" FontSize="20" FontFamily="Cooper Black"/>
+                        <Button x:Name="DoWorkButton" Content="Reorder" HorizontalAlignment="Left" Margin="811,57,0,0" VerticalAlignment="Top" Width="121" Click="DoWorkButton_Click" Height="100" FontSize="20" FontFamily="Cooper Black"/>
+                        
+                    </Grid>
                 </TabItem>
+                
+                
                 <TabItem>
                     <TabItem.Header>
                         <materialDesign:PackIcon Kind="Identifier" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
                     </TabItem.Header>
-                    <TextBlock Text="Identify Areas Comming Soon" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Grid>
+                        <TextBox>
+                            Match CallNumbers To Description, Hold Ctrl to select more then one Description. Select Only 4.
+                        </TextBox>
+
+                        <ProgressBar x:Name="ProgressBarStatus2" HorizontalAlignment="Center" Height="50" Margin="-40, 0, 0, 10" VerticalAlignment="Bottom" Width="150" ValueChanged="ProgressBar_ValueChanged" FontSize="20"/>
+                        
+                        <ListView Name="listViewID" Height="250" Width="450" Margin="10, 25, 50, 80" SelectionChanged="listViewID_SelectionChanged">
+                            
+                        </ListView>
+                        
+                        <Button Name="BtnID" Height="50" Width="150" Margin="10, 25, 50, -240" Click="BtnID_Click">
+                            <TextBlock>Check Answers</TextBlock>
+                        </Button>
+
+                        <ComboBox Name="CallNumberItems" Width="150" HorizontalAlignment="Left"  Margin="10, 20, 50, 300">
+                        </ComboBox>
+
+                        <ComboBox Name="CallNumberItems2" Width="150" HorizontalAlignment="Left"  Margin="10, 20, 50, 150">
+                        </ComboBox>
+
+                        <ComboBox Name="CallNumberItems3" Width="150" HorizontalAlignment="Left"  Margin="10, 20, 50, -50" >
+                        </ComboBox>
+
+                        <ComboBox Name="CallNumberItems4" Width="150" HorizontalAlignment="Left"  Margin="10, 20, 50, -200" >
+                        </ComboBox>
+                    </Grid>
                 </TabItem>
+                
+
                 <TabItem>
                     <TabItem.Header>
                         <materialDesign:PackIcon Kind="Search" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
                     </TabItem.Header>
                     <TextBlock Text="Find Call Number Comming Soon" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </TabItem>
+                
+                
             </dragablz:TabablzControl>
-            <ProgressBar x:Name="ProgressBarStatus" HorizontalAlignment="Left" Height="70" Margin="426,10,0,0" VerticalAlignment="Top" Width="381" ValueChanged="ProgressBar_ValueChanged" FontSize="20"/>
-            <TextBlock x:Name="ProgressTextBlock" HorizontalAlignment="Left" Margin="426,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="56" Width="208" FontSize="20" FontFamily="Cooper Black"/>
-            <Button x:Name="DoWorkButton" Content="Reorder" HorizontalAlignment="Left" Margin="811,57,0,0" VerticalAlignment="Top" Width="121" Click="DoWorkButton_Click" Height="100" FontSize="20" FontFamily="Cooper Black"/>
         </Grid>
     </Grid>
 </Window>
