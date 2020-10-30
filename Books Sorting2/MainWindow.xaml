@@ -78,16 +78,23 @@
                         </ComboBox>
                     </Grid>
                 </TabItem>
-                
+
 
                 <TabItem>
                     <TabItem.Header>
                         <materialDesign:PackIcon Kind="Search" Foreground="{DynamicResource PrimaryHueLightBrush}" Width="120" Height="80" FontSize="20" FontFamily="Cooper Black"/>
                     </TabItem.Header>
-                    <TextBlock Text="Find Call Number Comming Soon" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <StackPanel>
+                        <Label Content="Score" Height="55" FontSize="30" HorizontalAlignment="Center"/>
+                        <Label Name="scoreNumID" Content="O" FontSize="30" HorizontalAlignment="Center"/>
+                        <Label Name="thirdLevelID" Content="Color" Height="100" FontSize="30"/>
+                        <RadioButton x:Name="levelThreeOptionOne" Click="levelThreeOptionOne_Click" FontSize="30">Option1</RadioButton>
+                        <RadioButton x:Name="levelThreeOptionTwo" Click="levelThreeOptionTwo_Click" FontSize="30">Option2</RadioButton>
+                        <RadioButton x:Name="levelThreeOptionThree" Click="levelThreeOptionThree_Click" FontSize="30">Option3</RadioButton>
+                        <RadioButton x:Name="levelThreeOptionFour" Click="levelThreeOptionFour_Click" FontSize="30">Option4</RadioButton>
+                        <Button x:Name="LevelTwoBtn" Width="180" Content="Restart Game" Height="80" HorizontalAlignment="Center" Click="LevelTwoBtn_Click" FontSize="20"></Button>
+                    </StackPanel>
                 </TabItem>
-                
-                
             </dragablz:TabablzControl>
         </Grid>
     </Grid>

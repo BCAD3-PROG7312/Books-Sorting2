@@ -155,8 +155,11 @@
     </ApplicationDefinition>
     <Compile Include="BookDetails2.cs" />
     <Compile Include="BookDetails.cs" />
+    <Compile Include="ClassData.cs" />
     <Compile Include="ProgressReport.cs" />
     <Compile Include="ShuffleArray.cs" />
+    <Compile Include="TreeNode.cs" />
+    <Compile Include="TreeOne.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -199,6 +202,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="ClassificationData\data.txt" />
     <Content Include="Core\Compression\Snappy\lib\win\snappy32.dll" />
     <Content Include="Core\Compression\Snappy\lib\win\snappy64.dll" />
     <Content Include="Core\Compression\Zstandard\lib\win\libzstd.dll" />

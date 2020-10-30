@@ -1,25 +1,16 @@
-﻿using MongoDB.Driver;
-using MongoDB.Bson;
-using MongoDB.Driver.Linq;
+﻿using MongoDB.Driver.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MongoDB.Driver.Builders;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
-using System.ComponentModel;
-using System.Threading;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Books_Sorting2
 {
@@ -33,13 +24,37 @@ namespace Books_Sorting2
         Random range = new Random();
         NextDouble nextDouble = new NextDouble();
         Dictionary<int, string> CallNumbersAndClassificationDictionary = new Dictionary<int, string>();
-        int[] sortRandomly = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900};
+        int[] sortRandomly = { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900 };
+        List<string> ClassificationData = new List<string>();
+        public static TreeOne<ClassData> Classification = new TreeOne<ClassData>();
+        ShuffleArray shuffleArray = new ShuffleArray();
+
+        int LevelTwoIndex = 0;
+        int LevelOneIndex = 0;
+        List<string> getFirstLevelDescriptionRandomly = new List<string>();
+        List<string> getSecondDescriptionRandomly = new List<string>();
+        List<string> getThirdDescriptionRandomly = new List<string>();
+
+        int indexq = 0;
+
+        List<string> getFirstLevelDescriptionRandomly2 = new List<string>();
+        List<string> getSecondDescriptionRandomly2 = new List<string>();
+        List<string> getThirdDescriptionRandomly2 = new List<string>();
+
+        List<double> GetCallNumOfEachRadioButton = new List<double>();
+        string GetCallDesc = "";
+        string GetCallNum = "";
+        int CountPoints = 1;
 
         public MainWindow()
         {
             InitializeComponent();
             AddUnsortedCollection();
             add();
+
+            ReadTextFile();
+            AddDataFromListToNode();
+            LevelOne();
         }
         //adds all the call numbers and randomly generate their number within a range then displays it
         private void AddUnsortedCollection()
@@ -94,7 +109,7 @@ namespace Books_Sorting2
             StringBuilder sb = new StringBuilder();
             foreach (var item in call_number)
             {
-                sb.AppendLine(item.BookNumber +  ": " + item.AuthorDetails);
+                sb.AppendLine(item.BookNumber + ": " + item.AuthorDetails);
             }
             MessageBox.Show(sb.ToString(), "Unsorted Call Number Version");
         }
@@ -179,8 +194,6 @@ namespace Books_Sorting2
         //Shuffles the data within the array then adds it too the call number combobox
         private void SortsCallNumbersRandomly()
         {
-            ShuffleArray shuffleArray = new ShuffleArray();
-
             shuffleArray.ShuffleArray2(sortRandomly);
             foreach (var item in sortRandomly)
             {
@@ -244,6 +257,449 @@ namespace Books_Sorting2
                     }
                 }
             }
+        }
+        //Adds the data from the textfile to a list
+        private void ReadTextFile()
+        {
+            var fileStream = new FileStream(@"C:\\Users\\Sbongiseni\\Documents\\Degree in Computer Science in Application Development\\Year 3\\Samester 2\\PROG7312\\17395647_Task_One\\Books Sorting2\\Books Sorting2\\ClassificationData\\data.txt", FileMode.Open, FileAccess.Read);
+
+            using (var streaRead = new StreamReader(fileStream, Encoding.UTF8))
+            {
+                string line;
+
+                while ((line = streaRead.ReadLine()) != null)
+                {
+                    ClassificationData.Add(line);
+                }
+            }
+        }
+        //Adds data into the Node
+        private void AddDataFromListToNode()
+        {
+            if (Classification.Root == null)
+            {
+                Classification.Root = new TreeNode<ClassData>();
+            }
+            int counter = 0;
+
+            foreach (var item in ClassificationData)
+            {
+                
+                string[] input = item.Split(' ');
+                string callnumber = input[0];
+                string description = "";
+
+                //Gets the description
+                for (int i = 1; i < input.Length; i++)
+                {
+                    description = description + " " +  input[i];
+                }
+
+                if (callnumber.Substring(1, 2).Equals("00"))
+                {
+                    LevelOne(input[0], input[1]);
+                    LevelOneIndex++;
+                    LevelTwoIndex = 0;
+                    LevelTwo(input[0], input[1]);
+
+                    //Gets the first level of the description
+                    getFirstLevelDescriptionRandomly.Add(callnumber + " " + description);
+                    getFirstLevelDescriptionRandomly2.Add(callnumber);
+                } 
+                else if (callnumber.Substring(2).Equals("0"))
+                {
+                    LevelTwoIndex++;
+                    LevelTwo(input[0], input[1]);
+                    getSecondDescriptionRandomly.Add(callnumber + " " + description);
+                    getSecondDescriptionRandomly2.Add(callnumber);
+                }
+                else
+                {
+                    LevelThree(input[0], input[1]);
+                    getThirdDescriptionRandomly.Add(callnumber + " " + description);
+                    getThirdDescriptionRandomly2.Add(callnumber);
+                    counter++;
+                }
+            }
+        }
+        private void LevelOne(string callnum, string description)
+        {
+            if (Classification.Root.Children == null)
+            {
+                Classification.Root.Children = new List<TreeNode<ClassData>>()
+                {
+                    new TreeNode<ClassData>()
+                    {
+                        Data = new ClassData(callnum, description)
+                    }
+                };
+            }
+            else
+            {
+                Classification.Root.Children.Add(new TreeNode<ClassData>()
+                {
+                    Data = new ClassData(callnum, description)
+                }
+                );
+            }
+        }
+        private void LevelTwo(string callnum, string description)
+        {
+            if (Classification.Root.Children[(LevelOneIndex - 1)].Children == null)
+            {
+                Classification.Root.Children[(LevelOneIndex - 1)].Children = new List<TreeNode<ClassData>>()
+                {
+                    new TreeNode<ClassData>()
+                    {
+                        Data = new ClassData(callnum, description),
+                        Parent = Classification.Root.Children[(LevelOneIndex - 1)].Data
+                    }
+                };
+            }
+            else
+            {
+                Classification.Root.Children[(LevelOneIndex - 1)].Children.Add(new TreeNode<ClassData>()
+                {
+                    Data = new ClassData(callnum, description),
+                    Parent = Classification.Root.Children[(LevelOneIndex - 1)].Data
+                }
+                );
+            }
+        }
+        private void LevelThree(string callnum, string description)
+        {
+            if (Classification.Root.Children[(LevelOneIndex - 1)].Children[LevelTwoIndex].Children == null)
+            {
+                Classification.Root.Children[(LevelOneIndex - 1)].Children[LevelTwoIndex].Children = new List<TreeNode<ClassData>>()
+                {
+                    new TreeNode<ClassData>()
+                    {
+                        Data = new ClassData(callnum, description),
+                        Parent = Classification.Root.Children[(LevelOneIndex - 1)].Children[LevelTwoIndex].Data
+                    }
+                };
+            }
+            else
+            {
+                Classification.Root.Children[(LevelOneIndex - 1)].Children[LevelTwoIndex].Children.Add(new TreeNode<ClassData>()
+                {
+                    Data = new ClassData(callnum, description),
+                    Parent = Classification.Root.Children[(LevelOneIndex - 1)].Children[LevelTwoIndex].Data
+                }
+                );
+            }
+        }
+        //Gets the level One
+        private void LevelOne()
+        {
+            Random random = new Random();
+            NextDouble next = new NextDouble();
+
+            //Randomly Generat the 
+            bool check = true;
+
+            int lvOne = 0;
+            int lvTwo = 0;
+            int lvThree = 0;
+
+            while (check == true)
+            {
+                lvOne = (int)next.NextDouble2(random, 0, 9);
+                lvTwo = (int)next.NextDouble2(random, 0, 9);
+                lvThree = (int)next.NextDouble2(random, 0, 9);
+
+                try
+                {
+                    thirdLevelID.Content = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.Description;
+                    GetCallNum = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.CallNumber;
+                    GetCallDesc = thirdLevelID.Content.ToString();
+                    check = false;
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            int counter = 1;
+            ArrayList arrayLevelOne = new ArrayList();
+            arrayLevelOne.Add(lvOne);
+
+
+            while (counter < 4)
+            {
+                lvOne = (int)next.NextDouble2(random, 0, 9);
+
+                if (!arrayLevelOne.Contains(lvOne))
+                {
+                    arrayLevelOne.Add(lvOne);
+                    counter++;
+                }
+            }
+            arrayLevelOne.Sort();
+
+            ArrayList arrayLevelOneStrings = new ArrayList();
+
+
+            foreach (int item in arrayLevelOne)
+            {
+                arrayLevelOneStrings.Add(Classification.Root.Children[item].Data.Description);
+            }
+
+            levelThreeOptionOne.Content = arrayLevelOne[0] + "00 " + arrayLevelOneStrings[0];
+            levelThreeOptionTwo.Content = arrayLevelOne[1] + "00 " + arrayLevelOneStrings[1];
+            levelThreeOptionThree.Content = arrayLevelOne[2] + "00 " + arrayLevelOneStrings[2];
+            levelThreeOptionFour.Content = arrayLevelOne[3] + "00 " + arrayLevelOneStrings[3];
+        }
+        //Gets the level Two
+        private void LevelTwo()
+        {
+            Random random = new Random();
+            NextDouble next = new NextDouble();
+
+            //Randomly Generat the 
+            bool check = true;
+
+            int lvOne = 0;
+            int lvTwo = 0;
+            int lvThree = 0;
+
+            while (check == true)
+            {
+                lvOne = (int)next.NextDouble2(random, 0, 9);
+                lvTwo = (int)next.NextDouble2(random, 0, 9);
+                lvThree = (int)next.NextDouble2(random, 0, 9);
+
+                try
+                {
+                    thirdLevelID.Content = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.Description; 
+                    GetCallNum = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.CallNumber;
+                    GetCallDesc = thirdLevelID.Content.ToString();
+                    check = false;
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            int counter = 1;
+            ArrayList arrayLevelOne = new ArrayList();
+            arrayLevelOne.Add(lvTwo);
+
+
+            while (counter < 4)
+            {
+                lvTwo = (int)next.NextDouble2(random, 0, 9);
+
+                if (!arrayLevelOne.Contains(lvTwo))
+                {
+                    arrayLevelOne.Add(lvTwo);
+                    counter++;
+                }
+            }
+            arrayLevelOne.Sort();
+
+            ArrayList arrayLevelOneStrings = new ArrayList();
+
+            foreach (int item in arrayLevelOne)
+            {
+                arrayLevelOneStrings.Add(Classification.Root.Children[lvOne].Children[item].Data.Description);
+            }
+
+            levelThreeOptionOne.Content = lvOne.ToString() + arrayLevelOne[0] + "0 " + arrayLevelOneStrings[0];
+            levelThreeOptionTwo.Content = lvOne.ToString() + arrayLevelOne[1] + "0 " + arrayLevelOneStrings[1];
+            levelThreeOptionThree.Content = lvOne.ToString() + arrayLevelOne[2] + "0 " + arrayLevelOneStrings[2];
+            levelThreeOptionFour.Content = lvOne.ToString() + arrayLevelOne[3] + "0 " + arrayLevelOneStrings[3];
+        }
+        //Score gameafication feature
+        private void levelThreeOptionOne_Click(object sender, RoutedEventArgs e)
+        {
+            if (levelThreeOptionOne.IsChecked == true)
+            {
+                string content = "";
+                string content2 = "";
+                string content3 = "";
+                string content4 = "";
+
+                content = levelThreeOptionOne.Content.ToString().Substring(0, 3);
+                content2 = levelThreeOptionTwo.Content.ToString().Substring(0, 3);
+                content3 = levelThreeOptionThree.Content.ToString().Substring(0, 3);
+                content4 = levelThreeOptionFour.Content.ToString().Substring(0, 3);
+
+                //Level One Call Numbers
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content2));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content3));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content4));
+
+                double searchValue = Convert.ToDouble(GetCallNum);
+
+                double nearest = GetCallNumOfEachRadioButton.Select(p => new { Value = p, Difference = Math.Abs(p - searchValue) })
+                  .OrderBy(p => p.Difference)
+                  .First().Value;
+
+                string firstNumber = GetCallNum.Substring(0, 1);
+                //string firstNumberOfNearestRadioNum = nearest.ToString().Substring(0, 1);
+                string radioButtonOneNum = content.Substring(0, 1);
+
+
+                if (radioButtonOneNum.Equals(firstNumber))
+                {
+                    MessageBox.Show("CORRECT!");
+                    scoreNumID.Content = CountPoints++ + 100;
+                    LevelTwo();
+                }
+                else
+                {
+                    MessageBox.Show("INCORRECT Try Again");
+                    LevelOne();
+                }
+            }
+        }
+
+        private void levelThreeOptionTwo_Click(object sender, RoutedEventArgs e)
+        {
+            if (levelThreeOptionTwo.IsChecked == true)
+            {
+                string content = "";
+                string content2 = "";
+                string content3 = "";
+                string content4 = "";
+
+                content = levelThreeOptionOne.Content.ToString().Substring(0, 3);
+                content2 = levelThreeOptionTwo.Content.ToString().Substring(0, 3);
+                content3 = levelThreeOptionThree.Content.ToString().Substring(0, 3);
+                content4 = levelThreeOptionFour.Content.ToString().Substring(0, 3);
+
+                //Level One Call Numbers
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content2));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content3));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content4));
+
+                double searchValue = Convert.ToDouble(GetCallNum);
+
+                double nearest = GetCallNumOfEachRadioButton.Select(p => new { Value = p, Difference = Math.Abs(p - searchValue) })
+                  .OrderBy(p => p.Difference)
+                  .First().Value;
+
+
+                string firstNumber = GetCallNum.Substring(0, 1);
+                //string firstNumberOfNearestRadioNum = nearest.ToString().Substring(0, 1);
+                string radioButtonOneNum = content2.Substring(0, 1);
+
+
+                if (radioButtonOneNum.Equals(firstNumber))
+                {
+                    MessageBox.Show("CORRECT!");
+                    scoreNumID.Content = CountPoints++ + 100;
+                    LevelTwo();
+                }
+                else
+                {
+                    MessageBox.Show("INCORRECT Try Again");
+                    LevelOne();
+                }
+            }
+        }
+
+        private void levelThreeOptionThree_Click(object sender, RoutedEventArgs e)
+        {
+            if (levelThreeOptionThree.IsChecked == true)
+            {
+                string content = "";
+                string content2 = "";
+                string content3 = "";
+                string content4 = "";
+
+                content = levelThreeOptionOne.Content.ToString().Substring(0, 3);
+                content2 = levelThreeOptionTwo.Content.ToString().Substring(0, 3);
+                content3 = levelThreeOptionThree.Content.ToString().Substring(0, 3);
+                content4 = levelThreeOptionFour.Content.ToString().Substring(0, 3);
+
+                //Level One Call Numbers
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content2));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content3));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content4));
+
+                double searchValue = Convert.ToDouble(GetCallNum);
+
+                double nearest = GetCallNumOfEachRadioButton.Select(p => new { Value = p, Difference = Math.Abs(p - searchValue) })
+                  .OrderBy(p => p.Difference)
+                  .First().Value;
+
+
+                string firstNumber = GetCallNum.Substring(0, 1);
+                //string firstNumberOfNearestRadioNum = nearest.ToString().Substring(0, 1);
+                string radioButtonOneNum = content3.Substring(0, 1);
+
+
+                if (radioButtonOneNum.Equals(firstNumber))
+                {
+                    MessageBox.Show("CORRECT!");
+                    scoreNumID.Content = CountPoints++ + 100;
+                    LevelTwo();
+                }
+                else
+                {
+                    MessageBox.Show("INCORRECT Try Again");
+                    LevelOne();
+                }
+            }
+        }
+
+        private void levelThreeOptionFour_Click(object sender, RoutedEventArgs e)
+        {
+            if (levelThreeOptionFour.IsChecked == true)
+            {
+                string content = "";
+                string content2 = "";
+                string content3 = "";
+                string content4 = "";
+
+                content = levelThreeOptionOne.Content.ToString().Substring(0, 3);
+                content2 = levelThreeOptionTwo.Content.ToString().Substring(0, 3);
+                content3 = levelThreeOptionThree.Content.ToString().Substring(0, 3);
+                content4 = levelThreeOptionFour.Content.ToString().Substring(0, 3);
+
+                //Level One Call Numbers
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content2));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content3));
+                GetCallNumOfEachRadioButton.Add(Convert.ToDouble(content4));
+
+                double searchValue = Convert.ToDouble(GetCallNum);
+
+                double nearest = GetCallNumOfEachRadioButton.Select(p => new { Value = p, Difference = Math.Abs(p - searchValue) })
+                  .OrderBy(p => p.Difference)
+                  .First().Value;
+
+
+                string firstNumber = GetCallNum.Substring(0, 1);
+                //string firstNumberOfNearestRadioNum = nearest.ToString().Substring(0, 1);
+                string radioButtonOneNum = content4.Substring(0, 1);
+
+
+                if (radioButtonOneNum.Equals(firstNumber))
+                {
+                    MessageBox.Show("CORRECT!");
+                    scoreNumID.Content = CountPoints++ + 100;
+                    LevelTwo();
+                }
+                else
+                {
+                    MessageBox.Show("INCORRECT Try Again");
+                    LevelOne();
+                }
+            }
+        }
+        //Restart Button
+        private void LevelTwoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Game Restarted Your Score will not be lost!");
+            LevelOne();
         }
     }
 }
