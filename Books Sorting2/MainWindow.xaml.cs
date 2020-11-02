@@ -28,6 +28,7 @@ namespace Books_Sorting2
         List<string> ClassificationData = new List<string>();
         public static TreeOne<ClassData> Classification = new TreeOne<ClassData>();
         ShuffleArray shuffleArray = new ShuffleArray();
+        static bool clickedAlt = false;
 
         int LevelTwoIndex = 0;
         int LevelOneIndex = 0;
@@ -46,15 +47,17 @@ namespace Books_Sorting2
         string GetCallNum = "";
         int CountPoints = 1;
 
+        int count = 0;
+
         public MainWindow()
         {
             InitializeComponent();
             AddUnsortedCollection();
             add();
-
             ReadTextFile();
             AddDataFromListToNode();
             LevelOne();
+            ButtonHidden();
         }
         //adds all the call numbers and randomly generate their number within a range then displays it
         private void AddUnsortedCollection()
@@ -74,11 +77,12 @@ namespace Books_Sorting2
             {
                 listName_ID.Items.Add(item.BookNumber + ": " + item.AuthorDetails);
             }
+            UserOrderID.Visibility = Visibility.Hidden;
         }
+        //Orders the call numbers in lowest to largest 
         private void AddCollection()
         {
             listName_ID.Items.Clear();
-            //Orders the call numbers in lowest to largest 
             var orderByDescendingResult = from s in call_number
                                           orderby s.BookNumber ascending
                                           select s;
@@ -88,13 +92,15 @@ namespace Books_Sorting2
                 listName_ID.Items.Add(item.BookNumber + ": " + item.AuthorDetails);
             }
         }
+        //Button the user can click to reorder the call numbers
+        private void UserOrderID_Click(object sender, RoutedEventArgs e)
+        {
+            AddCollection();
+            CorrectCallNumberMessage();
+        }
         //delays the methods 
         async Task UseDelay()
         {
-            await Task.Delay(1000);
-            AddCollection();
-            await Task.Delay(1000);
-            CorrectCallNumberMessage();
             await Task.Delay(1000);
             Compare();
         }
@@ -112,6 +118,8 @@ namespace Books_Sorting2
                 sb.AppendLine(item.BookNumber + ": " + item.AuthorDetails);
             }
             MessageBox.Show(sb.ToString(), "Unsorted Call Number Version");
+            MessageBox.Show("You may now sort the call numbers");
+            UserOrderID.Visibility = Visibility.Visible;
         }
         //ProgressBar Status
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -189,7 +197,55 @@ namespace Books_Sorting2
             {
                 listViewID.Items.Add(item.Value);
             }
+        }
+        //Refresh button allows the user to keep practising 
+        private void RefreshID_Click(object sender, RoutedEventArgs e)
+        {
+            if (clickedAlt == false)
+            {
+                listViewCallNumID.Items.Clear();
+                listViewID.Items.Clear();
 
+                shuffleArray.ShuffleArray2(sortRandomly);
+                foreach (var item in sortRandomly)
+                {
+                    foreach (var item2 in CallNumbersAndClassificationDictionary)
+                    {
+                        if (item == item2.Key)
+                        {
+                            listViewID.Items.Add(item2.Value);
+                        }
+                    }
+                }
+                SortsCallNumbersRandomly();
+            } else
+            {
+                listViewCallNumID.Items.Clear();
+                listViewID.Items.Clear();
+
+                shuffleArray.ShuffleArray2(sortRandomly);
+                foreach (var item in sortRandomly)
+                {
+                    foreach (var item2 in CallNumbersAndClassificationDictionary)
+                    {
+                        if (item == item2.Key)
+                        {
+                            listViewCallNumID.Items.Add(item2.Value);
+                        }
+                    }
+                }
+                shuffleArray.ShuffleArray2(sortRandomly);
+                foreach (var item in sortRandomly)
+                {
+                    foreach (var item2 in CallNumbersAndClassificationDictionary)
+                    {
+                        if (item == item2.Key)
+                        {
+                            listViewID.Items.Add(item2.Key);
+                        }
+                    }
+                }
+            }
         }
         //Shuffles the data within the array then adds it too the call number combobox
         private void SortsCallNumbersRandomly()
@@ -197,10 +253,7 @@ namespace Books_Sorting2
             shuffleArray.ShuffleArray2(sortRandomly);
             foreach (var item in sortRandomly)
             {
-                CallNumberItems.Items.Add(item);
-                CallNumberItems2.Items.Add(item);
-                CallNumberItems3.Items.Add(item);
-                CallNumberItems4.Items.Add(item);
+                listViewCallNumID.Items.Add(item);
             }
         }
         //The Check button, starts the progress bar then executes the check function
@@ -217,7 +270,15 @@ namespace Books_Sorting2
                  ProgressBarStatus2.Value = report.PercentComplete;
              };
             await ProcessData(list, progress);
-            ChecksIfItemIsCorrect();
+
+            if (clickedAlt == false)
+            {
+                ChecksIfItemIsCorrect();
+            }
+            else
+            {
+                ChecksIfItemIsCorrect2();
+            }
         }
         //Count in the background
         private Task ProcessData(List<string> list, IProgress<ProgressReport> progress)
@@ -238,6 +299,7 @@ namespace Books_Sorting2
         //Saves the Muiltiply selected description into an arraylist then compares it too the callnumber and classification dictionary and see which in is corret
         private void ChecksIfItemIsCorrect()
         {
+            List<string> value = new List<string>();
             ArrayList saveSelectedITems = new ArrayList();
 
             foreach (var item in listViewID.SelectedItems)
@@ -250,12 +312,71 @@ namespace Books_Sorting2
                 {
                     if (item2.Equals(item3.Value))
                     {
-                        if (CallNumberItems.SelectedItem.Equals(item3.Key) || CallNumberItems2.SelectedItem.Equals(item3.Key) || CallNumberItems3.SelectedItem.Equals(item3.Key) || CallNumberItems4.SelectedItem.Equals(item3.Key))
-                        {
-                            MessageBox.Show("Correct Answer CallNumber: " + item3.Key + " Description: " + item3.Value);
-                        }
+                        value.Add("The correct value: " + item3.Value + " The correct call number: " + item3.Key);
                     }
                 }
+            }
+            string toDisplay = string.Join(Environment.NewLine, value);
+            MessageBox.Show(toDisplay);
+        }
+        private void ChecksIfItemIsCorrect2()
+        {
+            List<string> value = new List<string>();
+            ArrayList saveSelectedITems = new ArrayList();
+
+            foreach (var item in listViewCallNumID.SelectedItems)
+            {
+                saveSelectedITems.Add(item + "");
+            }
+            foreach (var item2 in saveSelectedITems)
+            {
+                foreach (var item3 in CallNumbersAndClassificationDictionary)
+                {
+                    if (item2.Equals(item3.Value))
+                    {
+                        value.Add("The correct value: " + item3.Value + " The correct call number: " + item3.Key);
+                    }
+                }
+            }
+            string toDisplay = string.Join(Environment.NewLine, value);
+            MessageBox.Show(toDisplay);
+        }
+        //Altarnate button, it altarnate between the call number and call description
+        private void AltinateID_Click(object sender, RoutedEventArgs e)
+        {
+            if (clickedAlt == false)
+            {
+                listViewCallNumID.Items.Clear();
+                listViewID.Items.Clear();
+
+                foreach (var item in CallNumbersAndClassificationDictionary)
+                {
+                    listViewCallNumID.Items.Add(item.Value);
+                }
+
+                shuffleArray.ShuffleArray2(sortRandomly);
+                foreach (var item in sortRandomly)
+                {
+                    listViewID.Items.Add(item);
+                }
+                clickedAlt = true;
+            }
+            else
+            {
+                listViewCallNumID.Items.Clear();
+                listViewID.Items.Clear();
+
+                foreach (var item in CallNumbersAndClassificationDictionary)
+                {
+                    listViewID.Items.Add(item.Value);
+                }
+
+                shuffleArray.ShuffleArray2(sortRandomly);
+                foreach (var item in sortRandomly)
+                {
+                    listViewCallNumID.Items.Add(item);
+                }
+                clickedAlt = false;
             }
         }
         //Adds the data from the textfile to a list
@@ -284,7 +405,7 @@ namespace Books_Sorting2
 
             foreach (var item in ClassificationData)
             {
-                
+
                 string[] input = item.Split(' ');
                 string callnumber = input[0];
                 string description = "";
@@ -292,7 +413,7 @@ namespace Books_Sorting2
                 //Gets the description
                 for (int i = 1; i < input.Length; i++)
                 {
-                    description = description + " " +  input[i];
+                    description = description + " " + input[i];
                 }
 
                 if (callnumber.Substring(1, 2).Equals("00"))
@@ -305,7 +426,7 @@ namespace Books_Sorting2
                     //Gets the first level of the description
                     getFirstLevelDescriptionRandomly.Add(callnumber + " " + description);
                     getFirstLevelDescriptionRandomly2.Add(callnumber);
-                } 
+                }
                 else if (callnumber.Substring(2).Equals("0"))
                 {
                     LevelTwoIndex++;
@@ -472,7 +593,7 @@ namespace Books_Sorting2
 
                 try
                 {
-                    thirdLevelID.Content = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.Description; 
+                    thirdLevelID.Content = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.Description;
                     GetCallNum = Classification.Root.Children[lvOne].Children[lvTwo].Children[lvThree].Data.CallNumber;
                     GetCallDesc = thirdLevelID.Content.ToString();
                     check = false;
@@ -548,7 +669,7 @@ namespace Books_Sorting2
                 {
                     MessageBox.Show("CORRECT!");
                     scoreNumID.Content = CountPoints++ + 100;
-                    LevelTwo();
+                    LevelTwoBtn.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -557,7 +678,6 @@ namespace Books_Sorting2
                 }
             }
         }
-
         private void levelThreeOptionTwo_Click(object sender, RoutedEventArgs e)
         {
             if (levelThreeOptionTwo.IsChecked == true)
@@ -594,7 +714,7 @@ namespace Books_Sorting2
                 {
                     MessageBox.Show("CORRECT!");
                     scoreNumID.Content = CountPoints++ + 100;
-                    LevelTwo();
+                    LevelTwoBtn.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -603,7 +723,6 @@ namespace Books_Sorting2
                 }
             }
         }
-
         private void levelThreeOptionThree_Click(object sender, RoutedEventArgs e)
         {
             if (levelThreeOptionThree.IsChecked == true)
@@ -640,7 +759,7 @@ namespace Books_Sorting2
                 {
                     MessageBox.Show("CORRECT!");
                     scoreNumID.Content = CountPoints++ + 100;
-                    LevelTwo();
+                    LevelTwoBtn.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -649,7 +768,6 @@ namespace Books_Sorting2
                 }
             }
         }
-
         private void levelThreeOptionFour_Click(object sender, RoutedEventArgs e)
         {
             if (levelThreeOptionFour.IsChecked == true)
@@ -686,7 +804,7 @@ namespace Books_Sorting2
                 {
                     MessageBox.Show("CORRECT!");
                     scoreNumID.Content = CountPoints++ + 100;
-                    LevelTwo();
+                    LevelTwoBtn.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -695,11 +813,22 @@ namespace Books_Sorting2
                 }
             }
         }
-        //Restart Button
+        //Sends the user to level two
         private void LevelTwoBtn_Click(object sender, RoutedEventArgs e)
         {
+            LevelTwo();
+        }
+        //Restart Button
+        private void RestartBtn_Click(object sender, RoutedEventArgs e)
+        {
+
             MessageBox.Show("Game Restarted Your Score will not be lost!");
             LevelOne();
+        }
+        //Hides the button the level two button
+        private void ButtonHidden()
+        {
+            LevelTwoBtn.Visibility = Visibility.Hidden;
         }
     }
 }
